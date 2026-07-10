@@ -1,0 +1,26 @@
+# docker-compose.yml (repo root)
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./backend/docker-schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "3306:3306"
+
+  api:
+    build:
+      context: ./backend
+    env_file: ./backend/.env
+    environment:
+      DB_HOST: db
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+
+volumes:
+  dbdata:
